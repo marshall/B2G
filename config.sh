@@ -105,6 +105,5 @@ if [ $? -ne 0 ]; then
 fi
 
 echo MAKE_FLAGS=-j$((CORE_COUNT + 2)) >> .config
-echo GECKO_OBJDIR=$PWD/objdir-gecko >> .config
 
 echo Run \|./build.sh\| to start building
