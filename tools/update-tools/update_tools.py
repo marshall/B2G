@@ -842,8 +842,9 @@ class FlashFotaBuilder(object):
         sys.path.pop()
 
     def zip_filter(self, path, relpath):
-        Item.Get(relpath, dir=os.path.isdir(path))
-        if not os.path.isdir(path) and os.path.islink(path):
+        is_dir = os.path.isdir(path)
+        Item.Get(relpath, dir=is_dir)
+        if not is_dir and os.path.islink(path):
             # This assumes that system always maps to /system, data to /data, etc
             self.symlinks.append((os.readlink(path), "/" + relpath))
             return False
@@ -863,6 +864,10 @@ class FlashFotaBuilder(object):
         os.unlink(unsigned_zip)
 
     def build_flash_script(self):
+        dir_keys = filter(lambda k: Item.ITEMS[k].dir, Item.ITEMS.keys())
+        for key in dir_keys:
+            Item.ITEMS[key + "/"] = Item.ITEMS[key]
+
         for mount_point, partition in self.fstab.iteritems():
             partition_type = common.PARTITION_TYPES[partition.fs_type]
             self.generator.AppendExtra('format("%s", "%s", "%s", %d);' % \
